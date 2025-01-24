@@ -55,7 +55,8 @@
             <div style="height: 500px; width: 300px;padding: 10px; color: white;">
                 <br><span>Pages: </span><span id="NowPage">1</span>/<span id="Pages">加载中</span>
                 <button onclick="back()">上一页</button>
-                <button onclick="front()">下一页</button>
+                <button onclick="front()">下一页</button><br><br>
+                <a href="" id="viewer" target="_blank"><button>View</button></a>
                 <br>
                 <br><span>Pid: </span><span id="pid">加载中</span>
                 <br><span>Author: </span><span id="author">加载中</span>
@@ -83,7 +84,7 @@
                     <option value="18" style="display: none;">R18</option>
                 </select>
                 <br>
-                <span>反代：</span> <select name="" id="pselect">
+                <span>反代：</span> <select name="" id="pselect" onclick="updproxy()">
                     <option value="i.pixiv.re">i.pixiv.re</option>
                     <option value="cf.acerkaio.top">cf.acerkaio.top</option>
                 </select>
@@ -92,12 +93,25 @@
         </main>
     </div>
     <script>
-        var url, idx = 0, pages = 0;
-        function back() { if (idx > 0) { --idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
-        function front() { if (idx < pages) { ++idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        var opt, url, idx = 0, pages = 0;
+        function back() { if (idx > 0) { --idx; document.getElementById("viewer").href = res.url[idx].replace("i.pximg.net", document.getElementById("pselect").value); document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        function front() { if (idx < pages) { ++idx; document.getElementById("viewer").href = res.url[idx].replace("i.pximg.net", document.getElementById("pselect").value); document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
         function rand(n) { return Math.floor(Math.random() * n) + 1 }
         __INIT__();
-
+        function updproxy() {
+            if (opt == 18) {
+                document.getElementById("viewer").href = res.urls.regular.replace("i.pixiv.re", document.getElementById("pselect").value);;
+                document.getElementById("MainImage").src = "https:\/\/" + document.getElementById("pselect").value + res.url;
+            } else {
+                if (pages == 0) {
+                    document.getElementById("MainImage").src = res.master.replace("i.pximg.net", document.getElementById("pselect").value);
+                    document.getElementById("viewer").href = res.url.replace("i.pximg.net", document.getElementById("pselect").value);;
+                } else {
+                    document.getElementById("viewer").href = res.url[idx].replace("i.pximg.net", document.getElementById("pselect").value);
+                    document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value);
+                }
+            }
+        }
         function __INIT__() {
             idx = 0, pages = 0;
             document.getElementById("NowPage").innerHTML = idx + 1;
@@ -108,11 +122,12 @@
             document.getElementById("tags").innerHTML = "加载中";
             document.getElementById("author").innerHTML = "加载中";
             document.getElementById("date").innerHTML = "加载中";
+            document.getElementById("viewer").href = "";
             const Http = new XMLHttpRequest();
             const Https = new XMLHttpRequest();
-            let opt = document.getElementById('gselect').value;
+            opt = document.getElementById('gselect').value;
             let nowhref = window.location.href;
-            // nowhref = "https://data.acerkaio.top/";
+            nowhref = "https://data.acerkaio.top/";
             url = nowhref + `${opt}/`;
             console.log(url);
             Http.open("GET", url);
@@ -127,6 +142,7 @@
                     Https.onreadystatechange = (e) => {
                         if (Https.readyState == 4 && Https.status == 200) {
                             res = JSON.parse(Https.responseText);
+                            res=res;
                             console.log(res);
                             if (opt == 18) {
                                 document.getElementById("Pages").innerHTML = "1";
@@ -135,12 +151,16 @@
                                 document.getElementById("tags").innerHTML = res.tags;
                                 document.getElementById("date").innerHTML = res.uploadDate;
                                 document.getElementById("author").innerHTML = res.author;
-                                document.getElementById("MainImage").src = "https:\/\/" + document.getElementById("pselect").value+ res.url;
+                                // WAIT!!!
+                                document.getElementById("viewer").href = res.urls.regular.replace("i.pixiv.re", document.getElementById("pselect").value);;
+                                document.getElementById("MainImage").src = "https:\/\/" + document.getElementById("pselect").value + res.url;
                             } else {
                                 pages = res.pages - 1;
                                 if (pages == 0) {
                                     document.getElementById("MainImage").src = res.master.replace("i.pximg.net", document.getElementById("pselect").value);
+                                    document.getElementById("viewer").href = res.url.replace("i.pximg.net", document.getElementById("pselect").value);;
                                 } else {
+                                    document.getElementById("viewer").href = res.url[idx].replace("i.pximg.net", document.getElementById("pselect").value);
                                     document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value);
                                 }
                                 document.getElementById("pid").innerHTML = res.pid;
