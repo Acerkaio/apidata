@@ -66,8 +66,6 @@
                 <button onclick="__INIT__()">换一张</button>
                 <br>
                 <br>
-                <br>
-                <br>
                 <span>源：</span> <select name="" id="gselect">
                     <option value="魔女の旅々10000users入り">魔女の旅々10000users入り</option>
                     <option value="魔女の旅々5000users入り">魔女の旅々5000users入り</option>
@@ -76,7 +74,7 @@
                     <option value="百合simple">百合simple</option>
                     <option value="百合">百合</option>
                     <option value="elaina">elaina</option>
-                    <option value="flat">贫</option>
+                    <option value="flat">贫/平</option>
                     <option value="白いストッキング">白いストッキング</option>
                     <option value="猫耳">猫耳</option>
                     <option value="足">足</option>
@@ -84,14 +82,19 @@
                     <option value="マルチシーン">マルチシーン</option>
                     <option value="18" style="display: none;">R18</option>
                 </select>
+                <br>
+                <span>反代：</span> <select name="" id="pselect">
+                    <option value="i.pixiv.re">i.pixiv.re</option>
+                    <option value="cf.acerkaio.top">cf.acerkaio.top</option>
+                </select>
 
             </div>
         </main>
     </div>
     <script>
         var url, idx = 0, pages = 0;
-        function back() { if (idx > 0) { --idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re"); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
-        function front() { if (idx < pages) { ++idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re"); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        function back() { if (idx > 0) { --idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        function front() { if (idx < pages) { ++idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
         function rand(n) { return Math.floor(Math.random() * n) + 1 }
         __INIT__();
 
@@ -108,7 +111,10 @@
             const Http = new XMLHttpRequest();
             const Https = new XMLHttpRequest();
             let opt = document.getElementById('gselect').value;
-            url = `https://data.acerkaio.top/${opt}/`;
+            let nowhref = window.location.href;
+            nowhref = "https://data.acerkaio.top/";
+            url = nowhref + `${opt}/`;
+            console.log(url);
             Http.open("GET", url);
             Http.send();
             Http.onreadystatechange = (e) => {
@@ -129,13 +135,13 @@
                                 document.getElementById("tags").innerHTML = res.tags;
                                 document.getElementById("date").innerHTML = res.uploadDate;
                                 document.getElementById("author").innerHTML = res.author;
-                                document.getElementById("MainImage").src = "https:\/\/i.pixiv.re"+res.url;
+                                document.getElementById("MainImage").src = "https:\/\/" + document.getElementById("pselect").value+ res.url;
                             } else {
                                 pages = res.pages - 1;
                                 if (pages == 0) {
-                                    document.getElementById("MainImage").src = res.master.replace("i.pximg.net", "i.pixiv.re");
+                                    document.getElementById("MainImage").src = res.master.replace("i.pximg.net", document.getElementById("pselect").value);
                                 } else {
-                                    document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re");
+                                    document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", document.getElementById("pselect").value);
                                 }
                                 document.getElementById("pid").innerHTML = res.pid;
                                 document.getElementById("Pages").innerHTML = res.pages;
