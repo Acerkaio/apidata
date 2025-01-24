@@ -1,0 +1,159 @@
+<!DOCTYPE html style="height: 100%;">
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random image</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0px;
+            height: 100%;
+            text-align: center;
+            background-color: rgb(14, 14, 14);
+        }
+
+        #app {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        main {
+            margin: 0 auto;
+            width: 800px;
+            height: 500px;
+            background-color: rgb(54, 54, 54);
+            border-radius: 2.5rem;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #MainImage {
+            margin: 0 auto;
+            max-width: 500px;
+            max-height: 470px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <main>
+            <div style="height: 500px; width: 500px;text-align: center;display: flex;align-items: center;">
+                <img src="" alt="" id="MainImage">
+            </div>
+            <div style="height: 500px; width: 300px;padding: 10px; color: white;">
+                <br><span>Pages: </span><span id="NowPage">1</span>/<span id="Pages">加载中</span>
+                <button onclick="back()">上一页</button>
+                <button onclick="front()">下一页</button>
+                <br>
+                <br><span>Pid: </span><span id="pid">加载中</span>
+                <br><span>Author: </span><span id="author">加载中</span>
+                <br><br><span>Title: </span><span id="title">加载中</span>
+                <br><br><span>Tags: </span><span id="tags">加载中</span>
+                <br><br><br><br><span>Date: </span><span id="date">加载中</span>
+                <br>
+                <button onclick="__INIT__()">换一张</button>
+                <br>
+                <br>
+                <br>
+                <br>
+                <span>源：</span> <select name="" id="gselect">
+                    <option value="魔女の旅々10000users入り">魔女の旅々10000users入り</option>
+                    <option value="魔女の旅々5000users入り">魔女の旅々5000users入り</option>
+                    <option value="魔女の旅々1000users入り">魔女の旅々1000users入り</option>
+                    <option value="魔女の旅々100users入り">魔女の旅々100users入り</option>
+                    <option value="百合simple">百合simple</option>
+                    <option value="百合">百合</option>
+                    <option value="elaina">elaina</option>
+                    <option value="flat">贫</option>
+                    <option value="白いストッキング">白いストッキング</option>
+                    <option value="猫耳">猫耳</option>
+                    <option value="足">足</option>
+                    <option value="けもみみ">けもみみ</option>
+                    <option value="マルチシーン">マルチシーン</option>
+                    <option value="18" style="display: none;">R18</option>
+                </select>
+
+            </div>
+        </main>
+    </div>
+    <script>
+        var url, idx = 0, pages = 0;
+        function back() { if (idx > 0) { --idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re"); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        function front() { if (idx < pages) { ++idx; document.getElementById("MainImage").src = "error"; setTimeout(function () { document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re"); }, 5); } document.getElementById("NowPage").innerHTML = idx + 1; }
+        function rand(n) { return Math.floor(Math.random() * n) + 1 }
+        __INIT__();
+
+        function __INIT__() {
+            idx = 0, pages = 0;
+            document.getElementById("NowPage").innerHTML = idx + 1;
+            document.getElementById("MainImage").src = "error";
+            document.getElementById("pid").innerHTML = "加载中";
+            document.getElementById("Pages").innerHTML = "加载中";
+            document.getElementById("title").innerHTML = "加载中";
+            document.getElementById("tags").innerHTML = "加载中";
+            document.getElementById("author").innerHTML = "加载中";
+            document.getElementById("date").innerHTML = "加载中";
+            const Http = new XMLHttpRequest();
+            const Https = new XMLHttpRequest();
+            let opt = document.getElementById('gselect').value;
+            url = `https://data.acerkaio.top/${opt}/`;
+            Http.open("GET", url);
+            Http.send();
+            Http.onreadystatechange = (e) => {
+                if (Http.readyState == 4 && Http.status == 200) {
+                    img = JSON.parse(Http.responseText);
+                    let id = rand(img.length) - 1;
+                    Https.open("GET", url + img[id]);
+                    console.log("random " + id + "           json: " + img[id]);
+                    Https.send();
+                    Https.onreadystatechange = (e) => {
+                        if (Https.readyState == 4 && Https.status == 200) {
+                            res = JSON.parse(Https.responseText);
+                            console.log(res);
+                            if (opt == 18) {
+                                document.getElementById("Pages").innerHTML = "1";
+                                document.getElementById("pid").innerHTML = res.pid;
+                                document.getElementById("title").innerHTML = res.title;
+                                document.getElementById("tags").innerHTML = res.tags;
+                                document.getElementById("date").innerHTML = res.uploadDate;
+                                document.getElementById("author").innerHTML = res.author;
+                                document.getElementById("MainImage").src = "https:\/\/i.pixiv.re"+res.url;
+                            } else {
+                                pages = res.pages - 1;
+                                if (pages == 0) {
+                                    document.getElementById("MainImage").src = res.master.replace("i.pximg.net", "i.pixiv.re");
+                                } else {
+                                    document.getElementById("MainImage").src = res.master[idx].replace("i.pximg.net", "i.pixiv.re");
+                                }
+                                document.getElementById("pid").innerHTML = res.pid;
+                                document.getElementById("Pages").innerHTML = res.pages;
+                                document.getElementById("title").innerHTML = res.title;
+                                document.getElementById("tags").innerHTML = res.tags;
+                                document.getElementById("author").innerHTML = res.author;
+                                document.getElementById("date").innerHTML = res.created_time;
+                            }
+                        }
+                    }
+
+                } else {
+                    console.log("Try to Http: " + Http.readyState + ' ' + Http.status);
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
